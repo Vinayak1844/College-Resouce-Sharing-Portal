@@ -9,4 +9,4 @@ class Resource(Base):
     scheme = Column(Integer, index=True, nullable=False)
     semester = Column(Integer, index=True, nullable=False)
     subject = Column(String(50), nullable=False)
-    file = Column(String(255), nullable=False)  # stores saved file path
+    file = Column(String(255))  # stores saved file path
