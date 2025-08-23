@@ -1,16 +1,15 @@
-from Project.models import Resource
-from pydantic import BaseModel
+from pydantic import BaseModel,ConfigDict
 
 
 class ResourceUser(BaseModel):
     course:str
-    schema:int
+    scheme:int
     semester:int
     subject:str
-    
-class UserFile(ResourceUser):
+
+class Resourceout(ResourceUser):
     id:int
     file:str
         
     class Config:
-        from_attributes = True
+        model_config = ConfigDict(from_attributes=True)
