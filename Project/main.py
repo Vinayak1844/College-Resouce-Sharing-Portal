@@ -1,9 +1,10 @@
-from fastapi import FastAPI,Depends,UploadFile,File,Form
+from fastapi import FastAPI,Depends,UploadFile,File,Form,Query
 from database import LocalSession,engine,Base
 import shutil
 import os
 from sqlalchemy.orm import Session
 import models
+from fastapi.responses import FileResponse
 
 
 def getdb():
@@ -55,3 +56,34 @@ def add_notes(
 @app.get("/notes/",)
 def get_notes(db:Session = Depends(getdb)):
     return db.query(models.Resource).all()
+
+
+@app.get("/download/")
+def download_resources(
+    db:Session = Depends(getdb),
+    course : str = Query(...),
+    scheme : int = Query(...),
+    semester :int = Query(...),
+    subject : str = Query(...)
+    ):
+    
+    record = (
+        db.query(models.Resource).filter(
+            models.Resource.course == course,
+            models.Resource.scheme == scheme,
+            models.Resource.semester == semester,
+            models.Resource.subject == subject
+        )
+    ).first()
+    
+    if not record:
+        return {"error": "No file found for the given filters"}
+
+    # file_path = os.path.join("uploads", record.file)
+
+    file_path = record.file.replace("\\", "/")
+    
+    if not os.path.exists(file_path):
+        return {"error": "File not found on server"}
+    
+    return FileResponse(path=file_path, filename=record.file, media_type="application/octet-stream")
